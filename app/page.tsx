@@ -1,10 +1,19 @@
-import { DarkModeToggle } from "@/lib/components/theme/dark-mode-toggle";
+import { Header } from "@/features/header";
+import { IntroSection } from "@/features/intro";
+import { Section2 } from "@/features/section2";
+import { Section3 } from "@/features/section3";
+import { UpdateUserSection } from "@/features/user-form";
 
 export default function Home() {
   return (
-    <div className="p-4">
-      <h1 className="text-primary">Hello World</h1>
-      <DarkModeToggle />
-    </div>
+    <>
+      <Header />
+      <main className="max-w-screen-max mx-auto px-2 md:px-4 space-y-32">
+        <IntroSection />
+        <Section2 />
+        <Section3 />
+        <UpdateUserSection />
+      </main>
+    </>
   );
 }
