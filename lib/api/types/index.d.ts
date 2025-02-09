@@ -1,4 +1,4 @@
-type DbRecordId = string;
+type DbRecordId = number;
 
 interface WithDbRecord {
   id: DbRecord;

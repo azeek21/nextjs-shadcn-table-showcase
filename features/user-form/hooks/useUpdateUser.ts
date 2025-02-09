@@ -24,7 +24,7 @@ interface TUseUpdateUser {
   count?: number;
   category?: CategoryWithCount;
   user?: User;
-  selectUser: (id: DbRecordId | string) => void;
+  selectUser: (id: DbRecordId) => void;
   selectCategory: (catid: DbRecordId | string) => void;
   setCount: (count: number) => void;
   isLoading: boolean;

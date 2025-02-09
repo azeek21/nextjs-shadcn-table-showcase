@@ -31,7 +31,7 @@ export function UserForm() {
     >
       <Select
         value={`${ctx?.user?.id || ""}`}
-        onValueChange={ctx.selectUser}
+        onValueChange={(v) => ctx.selectUser(Number(v))}
         disabled={ctx.isLoading || ctx.isFetching}
       >
         <SelectTrigger>
