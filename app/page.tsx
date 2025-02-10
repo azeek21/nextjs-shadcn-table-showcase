@@ -1,5 +1,7 @@
+import { Footer } from "@/features/footer";
 import { Header } from "@/features/header";
 import { IntroSection } from "@/features/intro";
+import { RatingsSection } from "@/features/ratings";
 import { Section2 } from "@/features/section2";
 import { Section3 } from "@/features/section3";
 import { UpdateUserSection } from "@/features/user-form";
@@ -13,7 +15,9 @@ export default function Home() {
         <Section2 />
         <Section3 />
         <UpdateUserSection />
+        <RatingsSection />
       </main>
+      <Footer />
     </>
   );
 }

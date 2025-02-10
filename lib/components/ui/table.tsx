@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils/shadcn";
+import { repeatAndCollect } from "@/lib/utils/iteratitons";
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -20,7 +21,11 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+  <thead
+    ref={ref}
+    className={cn("[&_tr]:border-b bg-accent-blugray", className)}
+    {...props}
+  />
 ));
 TableHeader.displayName = "TableHeader";
 
@@ -58,7 +63,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b transition-colors hover:bg-muted/50 even:bg-accent-blugray data-[state=selected]:bg-muted",
       className,
     )}
     {...props}
@@ -105,6 +110,29 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
+function TableSkeleton({ rowCount }: { rowCount: number }) {
+  return (
+    <Table>
+      <TableHeader className="animate-pulse">
+        <TableRow>
+          <TableHead></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {repeatAndCollect(rowCount, (i) => (
+          <TableRow
+            className="animate-pulse"
+            style={{ animationDelay: `${i * 100}ms` }}
+            key={`${i}`}
+          >
+            <TableCell colSpan={1}></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
 export {
   Table,
   TableHeader,
@@ -114,4 +142,5 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+  TableSkeleton,
 };
