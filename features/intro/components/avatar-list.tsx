@@ -30,7 +30,7 @@ export function AvatarList({ srcs, className, ...rest }: AvatarListProps) {
         }}
         className="w-12 h-12"
       >
-        <AvatarFallback className="bg-accent-purple text-primary-foreground p-2 font-semibold">
+        <AvatarFallback className="bg-accent-purple text-primary-foreground p-2 font-semibold dark:text-primary">
           +120
         </AvatarFallback>
       </Avatar>

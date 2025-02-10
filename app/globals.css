@@ -50,7 +50,7 @@ body {
     --radius: 0.5rem;
   }
   .dark {
-    --accent-blugray: 198 33% 96%;
+    --accent-blugray: 226 23% 30%;
     --background: 226 23% 19%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;

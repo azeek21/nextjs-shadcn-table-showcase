@@ -38,6 +38,7 @@ export function Header() {
 
         {/* actions */}
         <div className={"mt-auto md:ml-auto md:mt-0 flex gap-2"}>
+          <DarkModeToggle />
           <LanguageToggle />
           <CTATakeATest className="hidden md:block" />
         </div>

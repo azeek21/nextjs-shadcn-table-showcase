@@ -23,3 +23,8 @@ CIdagi preview buildni ham tekshiring. Eng kamida build bo'lishi va staging envi
 - TailwindCss
 - Shadcn
 - Tanstack-table
+- Tanstack-query
+- axios
+
+
+...va boshqalar )
