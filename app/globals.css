@@ -36,6 +36,7 @@ body {
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
     --accent-purple: 239 85% 63%;
+    --accent-blugray: 198 33% 96%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
@@ -49,6 +50,7 @@ body {
     --radius: 0.5rem;
   }
   .dark {
+    --accent-blugray: 198 33% 96%;
     --background: 226 23% 19%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;

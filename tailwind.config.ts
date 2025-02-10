@@ -45,6 +45,10 @@ export default {
           DEFAULT: "hsl(var(--accent-purple))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        "accent-blugray": {
+          DEFAULT: "hsl(var(--accent-blugray))",
+          foreground: "hsl(var(--foreground))",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

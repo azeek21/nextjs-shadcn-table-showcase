@@ -12,6 +12,7 @@ import {
 } from "@/lib/components/ui/select";
 import { getUserFullName } from "@/lib/utils/user";
 import { Input } from "@/lib/components/ui/input";
+import { Spinner } from "@/lib/components/ui/spinner";
 
 export function UserForm() {
   const ctx = useUpdateUser();
@@ -19,9 +20,9 @@ export function UserForm() {
     (ev: FormEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
-      ctx.setCount(ctx.count || 0);
+      ctx.updateCount();
     },
-    [ctx.setCount, ctx.count],
+    [ctx.setCount, ctx.count, ctx.updateCount],
   );
 
   return (
@@ -46,7 +47,7 @@ export function UserForm() {
         </SelectContent>
       </Select>
       <Select
-        disabled={ctx.isLoading || ctx.isFetching}
+        disabled={ctx.isLoading || ctx.isFetching || !ctx.user}
         onValueChange={ctx.selectCategory}
         value={`${ctx.category?.category_id || ""}`}
       >
@@ -72,7 +73,7 @@ export function UserForm() {
         />
       </Select>
       <Button type="submit" variant="purple" size="lg">
-        Set
+        SET {(ctx.isFetching || ctx.isLoading) && <Spinner />}
       </Button>
     </form>
   );

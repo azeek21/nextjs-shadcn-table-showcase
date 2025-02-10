@@ -2,21 +2,20 @@
 
 import { User } from "@/lib/types/user";
 import { CategoryWithCount, EnhancedUpdateMapping } from "../types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getCategoriesSlug,
   getCountsSlug,
   getUsersSlug,
 } from "@/lib/api/const/urls";
-import {
-  createEmptyEnhandecMap,
-  createEnhancer,
-  getCategories,
-  getCounts,
-  getUsers,
-} from "../api";
+import { createEmptyEnhandecMap, createEnhancer } from "../api";
+import { getCategories, getCounts, getUsers } from "@/lib/api/shared";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { checkIsNonEmptyArrayLike } from "@/lib/utils/checks";
+import { sleepFor } from "@/lib/utils/promises";
+import { SECOND } from "@/lib/const/durations";
+import { Count } from "@/lib/types/count";
 
 interface TUseUpdateUser {
   users: User[];
@@ -29,18 +28,17 @@ interface TUseUpdateUser {
   setCount: (count: number) => void;
   isLoading: boolean;
   isFetching: boolean;
+  updateCount: VoidFunction;
 }
-const userSlug = getUsersSlug();
-const categoriesSlug = getCategoriesSlug();
-const countSlug = getCountsSlug();
 
 export function useUpdateUser(): TUseUpdateUser {
+  const queryClient = useQueryClient();
   const {
     data: users,
     isLoading: isUsersLoading,
     isFetching: isUsersFetching,
   } = useQuery({
-    queryKey: [userSlug],
+    queryKey: [getUsersSlug()],
     queryFn: getUsers,
   });
 
@@ -49,7 +47,7 @@ export function useUpdateUser(): TUseUpdateUser {
     isLoading: isCategoriesLoading,
     isFetching: isCategoriesFetchig,
   } = useQuery({
-    queryKey: [categoriesSlug],
+    queryKey: [getCategoriesSlug()],
     queryFn: getCategories,
   });
 
@@ -58,17 +56,43 @@ export function useUpdateUser(): TUseUpdateUser {
     isLoading: isCountsLoading,
     isFetching: isCountsFetching,
   } = useQuery({
-    queryKey: [countSlug],
+    queryKey: [getCountsSlug],
     queryFn: getCounts,
   });
 
-  const enhancer = useMemo(
-    () =>
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["mutateCount"],
+    // We simply proxy mutation params to use in onSuccess to update cache easliy
+    mutationFn: async (params: {
+      userId: DbRecordId;
+      categoryId: DbRecordId;
+      count: number;
+    }) => {
+      await sleepFor(2 * SECOND);
+      return params;
+    },
+    onSuccess: (params) => {
+      queryClient.setQueryData([getCountsSlug()], (counts: Count[]) => {
+        return counts.map((c) => {
+          if (
+            c.user_id === params.userId &&
+            c.category_id === params.categoryId
+          ) {
+            return { ...c, count: params.count };
+          }
+          return c;
+        });
+      });
+    },
+  });
+
+  const enhancer = useMemo(() => {
+    return (
       checkIsNonEmptyArrayLike(counts) &&
       checkIsNonEmptyArrayLike(categories) &&
-      createEnhancer(counts, categories),
-    [counts, categories],
-  );
+      createEnhancer(counts, categories)
+    );
+  }, [counts, categories]);
 
   const [enhancedMap, setEnHancedMap] = useState<EnhancedUpdateMapping>(
     createEmptyEnhandecMap,
@@ -78,7 +102,6 @@ export function useUpdateUser(): TUseUpdateUser {
     (id: DbRecordId) => {
       const _id = Number(id);
       const found = users?.find((u) => u.id === _id);
-      console.log("select user", found);
       found && setEnHancedMap((m) => ({ ...m, user: found }));
       setCurrentCategory(undefined);
     },
@@ -98,17 +121,25 @@ export function useUpdateUser(): TUseUpdateUser {
     CategoryWithCount | undefined
   >();
 
+  const handleUpdateCount = useCallback(() => {
+    if (!enhancedMap.user?.id || !currentCategory) return;
+    mutate({
+      userId: enhancedMap.user.id,
+      categoryId: currentCategory.category_id,
+      count: currentCategory.count,
+    });
+  }, [enhancedMap, currentCategory]);
+
   useEffect(() => {
-    console.log("effect");
     if (enhancer) {
-      console.log("enhancer");
       setEnHancedMap(enhancer(enhancedMap));
     }
   }, [enhancer, enhancedMap.user]);
 
   return useMemo(
     () => ({
-      isFetching: isCountsFetching || isUsersFetching || isCategoriesFetchig,
+      isFetching:
+        isCountsFetching || isUsersFetching || isCategoriesFetchig || isPending,
       isLoading: isUsersLoading || isCategoriesLoading || isCountsLoading,
       users: checkIsNonEmptyArrayLike(users) ? users : [],
       categories: enhancedMap.categories,
@@ -116,13 +147,14 @@ export function useUpdateUser(): TUseUpdateUser {
       user: enhancedMap.user,
       selectUser: handleSelectUser,
       setCount: (c) => {
-        // TODO: dispatch updates to table from here
         setCurrentCategory((cat) => (cat ? { ...cat, count: c } : undefined));
       },
       count: currentCategory?.count,
       selectCategory: handleSelectCategory,
+      updateCount: handleUpdateCount,
     }),
     [
+      handleUpdateCount,
       handleSelectCategory,
       isCountsLoading,
       isCountsFetching,
@@ -134,6 +166,7 @@ export function useUpdateUser(): TUseUpdateUser {
       enhancedMap,
       currentCategory,
       handleSelectUser,
+      isPending,
     ],
   );
 }

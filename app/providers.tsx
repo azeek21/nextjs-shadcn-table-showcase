@@ -11,7 +11,11 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
+        // I am doing this because in domain of this project, server is NOT the source of thruth.
+        // We don't mutate server data, we mutate the cache directly from mutations with onSuccess callbacks.
+        // I'm gonna do use mutations still because it'll be easier to refactor if we move source of truth to server in the future.
+        staleTime: Infinity,
+        gcTime: Infinity,
       },
     },
   });
